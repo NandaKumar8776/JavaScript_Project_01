@@ -1,0 +1,368 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        .startButton {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .size {
+        height: 200px;
+        width: 200px;
+        }
+
+        .border {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        width: 400px;
+        }
+
+        .centerTop {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+        width: 400px;
+        }
+
+        .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 0px;
+        width: 400px;
+        }
+
+        .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        }
+
+        .item {
+        width: 32%;
+        padding-bottom: 0; /* 32:18, i.e. 16:9 */
+        margin-bottom: 1%; /* (100-32*3)/2 */
+        }
+
+        .button {
+        padding: 7px 12px;
+        font-size: 12px;
+        text-align: center;
+        cursor: pointer;
+        outline: black;
+        color: #fff;
+        background-color: #0483aa;
+        border: black;
+        border-radius: 7px;
+        box-shadow: 0 9px #999;
+        }
+
+        .button:hover {background-color: #3e6b8e}
+
+        .button:active {
+        background-color: #3e6b8e;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+        }
+
+        </style>
+
+    <script language="JavaScript" type="text/JavaScript">
+        
+        // JavaScript Project-1
+        // NandaKumar Balakrishnan
+
+        var i = 0;
+        var gamesPkArray = []
+        var gamesHomeArray = []
+        var gamesAwayArray = []
+
+        // Function to get the JSON Data
+        function retreiveJSON(url) {
+            // Taken from our slides on AJAX
+
+            var rep = "";
+            var xmlHttp = new XMLHttpRequest();
+            
+            if(xmlHttp !== null){
+                xmlHttp.open("GET", url, false);
+                xmlHttp.send(null);
+                resp = xmlHttp.responseText;
+            }
+
+            return resp;
+            
+        }
+
+        // Function to store the properties of GamePk, Home and Away Team names in an array to be indexed.
+        function retreiveMLB(givenData) {
+            
+            var games = givenData.dates[0].games;
+
+
+            for (oneGame of games) {
+                gamesPkArray.push(oneGame.gamePk)
+                gamesHomeArray.push(oneGame.teams.home.team.name)
+                gamesAwayArray.push(oneGame.teams.away.team.name)
+            }
+
+            return ([gamesPkArray, gamesHomeArray, gamesAwayArray]);
+        }
+
+        // To move to the next game
+        function nextGame(){
+            i = i + 1;
+
+            if (i < 0){
+                i = (gamesPkArray.length) - 1;
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+            
+
+            else if(i > (gamesPkArray.length-1)){
+                i = 0;
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+
+            else{
+                
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+        }
+        // To go to the previous game
+        function previousGame(){
+            i = i - 1;
+
+            if (i < 0){
+                i = (gamesPkArray.length) - 1;
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+            
+
+            else if(i > (gamesPkArray.length-1)){
+                i = 0;
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+
+            else{
+                document.getElementById("homeBox").value = gamesHomeArray[i];
+                document.getElementById("awayBox").value = gamesAwayArray[i];
+            }
+        }
+
+        // Setting highlight index and its array
+        var currentPk = 0;
+        var highlightIndex = 0;
+        var highlights = [];
+
+        // Move between highlights (front)
+        function getFrontHighlights() {
+
+            let current = highlights;
+
+            highlightIndex = highlightIndex + 1;
+            if (highlightIndex < 0){
+               highlightIndex = current.length - 1;
+               document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+            else if (highlightIndex > current.length-1){
+                highlightIndex = 0;
+                document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+
+            else{
+                document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+            
+            
+        }   
+
+        // Go back to previous highlights
+        function getBackHighlights() {
+
+            let current = highlights;
+            
+            highlightIndex = highlightIndex - 1;
+            if (highlightIndex < 0){
+               highlightIndex = current.length - 1;
+               document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+            else if (highlightIndex > current.length-1){
+                highlightIndex = 0;
+                document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+
+            else{
+                document.getElementById("highlightBox").value = current[highlightIndex].headline;
+            }
+        }
+        
+        // To show the first highlight of game and reset the highlight array index.
+        function getHighlights() {
+            highlightIndex = 0;
+            pk = gamesPkArray[i];
+            let URL2 = "https://statsapi.mlb.com/api/v1/game/"+ pk + "/content";
+            var gameInfo = retreiveJSON(URL2); 
+            var parsedInfo = JSON.parse(gameInfo);
+            highlights = parsedInfo?.highlights?.highlights?.items;
+            
+            document.getElementById("highlightBox").value = highlights[0].headline;
+
+            return(highlights[0].headline)
+            
+            
+        }
+
+        // To play the highlight's video using the highlight index.
+        function playHighlight(){
+            pk = gamesPkArray[i];
+            let URL2 = "https://statsapi.mlb.com/api/v1/game/"+ pk + "/content";
+            var gameInfo = retreiveJSON(URL2); 
+            var parsedInfo = JSON.parse(gameInfo);
+            highlights = parsedInfo?.highlights?.highlights?.items;
+            
+            let videoUrl = highlights[highlightIndex].playbacks[0].url;
+            //alert(videoUrl);
+            window.open(videoUrl, '_blank').focus();
+        }
+
+        // Initial function to call other functinos and show initial home, away team names and highlights.
+        function buttonClick() {
+            let enteredDate = document.getElementById("givenDate").value;
+         
+            //document.getElementById("awayBox").value = "away team namee";
+
+            let scheduleUrl = "https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&startDate="+enteredDate+"&endDate="+enteredDate;
+            
+            let jsonMLBData = retreiveJSON(scheduleUrl);
+
+            let parsedMLBData = JSON.parse(jsonMLBData);
+            
+            let [PkArray,HomeArray, AwayArray]  = retreiveMLB(parsedMLBData);
+
+            
+            document.getElementById("highlightBox").value = getHighlights(PkArray[0]);
+            document.getElementById("homeBox").value = HomeArray[0];
+            document.getElementById("awayBox").value = AwayArray[0];
+
+            
+            }
+
+
+        
+
+
+    </script>
+        
+</head>
+    <body>
+            <div class="container">
+                <div class="item">
+                    <div class="border">
+                        <div class="size">
+                        <p id="homeTeam"> Home team name :<p> 
+                        <input style="background-color: rgb(213, 248, 250); font-size: 20px;" type="text" id="homeBox">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    
+                            <div class="centerTop">
+                                <h1> From / To Date <h1> 
+                            </div>
+                            
+                            <div class="center">              
+                            <input style="background-color: rgb(213, 248, 250) ; font-size: 20px;" type="date" id="givenDate" min="2020-01-01">
+                            </div>
+                            <br>
+                            <br>
+                            <div class="center">
+                            <button id="submit" onclick="buttonClick();" class="button"> Retreive MLB Data for this Date </button>
+                            </div>
+                            <br><br><br><br>
+                            <div class="center" >
+                                <button onclick="nextGame();getHighlights()" class="button"> Next Game for this Date </button>
+                                <p>&nbsp;&nbsp;&nbsp;<p>
+                                <button onclick="previousGame(); getHighlights()"class="button"> Previous Game for this Date </button>                            
+                            </div>
+                            <br><br><br><br>
+                            <div class="center">
+                                <p> Highlight Playback :</p>                        
+                                <input style="background-color: rgb(213, 248, 250); font-size: 20px;" type="text" id="highlightBox">
+                            </div>
+                            <br><br>
+                            <div class="center" >
+                                <button class="button" onclick="getFrontHighlights()"> Next Highlight for this Date </button>
+                                <p>&nbsp;&nbsp;&nbsp;<p>
+                                <button class="button" onclick="getBackHighlights()"> Previous Highlight for this Date </button>                            
+                            </div>
+                            <br><br><br>
+                            <div class="center" >
+                                <button onclick="playHighlight()" class="button"> Run Playback for this Highlight </button>
+                            </div>
+                    
+                </div>
+        
+
+                <div class="item">
+                    <div class="border">
+                        <div class="size">
+                        <p id="awayTeam"> Away team name :<p> 
+                        <input style="background-color: rgb(213, 248, 250); font-size: 20px;" type="text" id="awayBox">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="item">
+                    <div class="border">
+                        <div class="size">
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="border">
+                      
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="border">
+                        <div class="size">
+                        
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+            
+    
+    
+    <!-- 
+        Sources:
+            https://www.w3schools.com/howto/howto_css_center_button.asp
+            https://tobiasahlin.com/blog/common-flexbox-patterns/#alternating-grid
+            https://stackoverflow.com/questions/64660946/html-is-there-a-way-to-limit-the-year-to-4-digits-in-date-input
+            https://www.w3schools.com/howto/howto_css_animate_buttons.asp
+        -->
+
+    </body>
+</html>  
+
+ 
+
