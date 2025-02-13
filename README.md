@@ -1,4 +1,4 @@
-# JavaScript Project 1: MLB Game and Highlights Viewer
+# JS Based MLB Game and Highlights Viewer
 
 ## Description
 This project retrieves and displays Major League Baseball (MLB) game data for a specified past date. The project is inspired by an MLB Demo example and leverages JavaScript to fetch data in JSON format from the MLB website. Users can view the home and away team names for games played on a selected day, browse through game highlights, and even play highlight videos in a new browser tab.
